@@ -1,14 +1,26 @@
+const fs = require('fs');
 const Discord = require('discord.js');
 const { prefix, token } = require('./config/config.json');
 
 // Init Discord
 const client = new Discord.Client();
+client.login(token);
+
+// Init Commands
+client.commands = new Discord.Collection();
+const commandFiles = fs
+  .readdirSync('./commands')
+  .filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`);
+  // set a new item in the Collection
+  // with the key as the command name and the value as the exported module
+  client.commands.set(command.name, command);
+}
 
 client.once('ready', () => {
   console.log('Ready!');
 });
-
-client.login(token);
 
 client.on('message', message => {
   // If the message either doesn't start with the prefix or was sent by a bot, exit early.
@@ -18,65 +30,14 @@ client.on('message', message => {
   const args = message.content.slice(prefix.length).split(/ +/);
   const command = args.shift().toLowerCase();
 
-  if (command === 'ping') {
-    message.channel.send('Pong.');
-  } else if (command === 'server') {
-    message.channel.send(
-      `Server name: ${message.guild.name}\nTotal members: ${
-        message.guild.memberCount
-      }`
-    );
-  } else if (command === 'user-info') {
-    message.channel.send(
-      `Your username: ${message.author.username}\nYour ID: ${message.author.id}`
-    );
-  } else if (command === 'args-info') {
-    if (!args.length) {
-      return message.channel.send(
-        `You didn't provide any arguments, ${message.author}!`
-      );
-    } else if (args[0] === 'foo') {
-      return message.channel.send('bar');
-    }
-    message.channel.send(`First argument: ${args[0]}`);
-  } else if (command === 'kick') {
-    // Sanity check if no user mentioned
-    if (!message.mentions.users.size) {
-      return message.reply('you need to tag a user in order to kick them!');
-    }
-    // grab the "first" mentioned user from the message
-    // this will return a `User` object, just like `message.author`
-    const taggedUser = message.mentions.users.first();
+  // If no such command name exit early.
+  if (!client.commands.has(command)) return;
 
-    message.channel.send(`You wanted to kick: ${taggedUser.username}`);
-  } else if (command === 'avatar') {
-    if (!message.mentions.users.size) {
-      return message.channel.send(
-        `Your avatar: ${message.author.displayAvatarURL}`
-      );
-    }
-
-    const avatarList = message.mentions.users.map(user => {
-      return `${user.username}'s avatar: ${user.displayAvatarURL}`;
-    });
-
-    // send the entire array of strings as a message
-    // by default, discord.js will `.join()` the array with `\n`
-    message.channel.send(avatarList);
-  } else if (command === 'prune') {
-    const amount = parseInt(args[0]) + 1;
-
-    if (isNaN(amount)) {
-      return message.reply("that doesn't seem to be a valid number.");
-    } else if (amount <= 1 || amount > 100) {
-      return message.reply('you need to input a number between 1 and 99.');
-    }
-
-    message.channel.bulkDelete(amount, true).catch(err => {
-      console.error(err);
-      message.channel.send(
-        'there was an error trying to prune messages in this channel!'
-      );
-    });
+  // Get and execute command with given args
+  try {
+    client.commands.get(command).execute(message, args);
+  } catch (error) {
+    console.error(error);
+    message.reply('there was an error trying to execute that command!');
   }
 });
