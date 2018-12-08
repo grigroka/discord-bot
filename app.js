@@ -5,6 +5,9 @@ const { prefix, token } = require('.');
 // Init Discord
 const client = new Discord.Client();
 client.login(token);
+client.once('ready', () => {
+  console.log('Ready!');
+});
 // Init cooldowns
 const cooldowns = new Discord.Collection();
 
