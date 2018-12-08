@@ -3,6 +3,8 @@
 module.exports = {
   name: 'prune',
   description: 'Remove from 1 to 99 most recent messages.',
+  args: true,
+  usage: '<1-99>',
   execute(message, args) {
     const amount = parseInt(args[0]) + 1;
 

@@ -3,6 +3,8 @@
 module.exports = {
   name: 'kick',
   description: 'Pseudo-kick test command.',
+  args: true,
+  usage: '<@user>',
   execute(message) {
     // Sanity check if no user mentioned
     if (!message.mentions.users.size) {
