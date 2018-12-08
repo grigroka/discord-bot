@@ -2,7 +2,8 @@
 
 module.exports = {
   name: 'kick',
-  description: 'Pseudo-kick test command.',
+  description: 'Kick a user from the server.',
+  guildOnly: true,
   args: true,
   usage: '<@user>',
   execute(message) {
