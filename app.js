@@ -33,7 +33,7 @@ client.on('message', message => {
   const command =
     client.commands.get(commandName) ||
     client.commands.find(
-      cmd => cmd.alliases && cmd.alliases.includes(commandName)
+      cmd => cmd.aliases && cmd.aliases.includes(commandName)
     );
   if (!command) return;
 
