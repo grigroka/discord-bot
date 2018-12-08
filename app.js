@@ -39,5 +39,15 @@ client.on('message', message => {
       return message.channel.send('bar');
     }
     message.channel.send(`First argument: ${args[0]}`);
+  } else if (command === 'kick') {
+    // Sanity check if no user mentioned
+    if (!message.mentions.users.size) {
+      return message.reply('you need to tag a user in order to kick them!');
+    }
+    // grab the "first" mentioned user from the message
+    // this will return a `User` object, just like `message.author`
+    const taggedUser = message.mentions.users.first();
+
+    message.channel.send(`You wanted to kick: ${taggedUser.username}`);
   }
 });
