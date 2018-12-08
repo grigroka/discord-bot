@@ -1,6 +1,6 @@
 const fs = require('fs');
 const Discord = require('discord.js');
-const { prefix, token } = require('./config.json');
+const { prefix, token } = require('.');
 
 // Init Discord
 const client = new Discord.Client();
@@ -29,11 +29,13 @@ client.on('message', message => {
   const args = message.content.slice(prefix.length).split(/ +/);
   const commandName = args.shift().toLowerCase();
 
-  // If no such command name exit early.
-  if (!client.commands.has(commandName)) return;
-
-  // Set command
-  const command = client.commands.get(commandName);
+  // Set command by its name or aliases, if no command - exit early.
+  const command =
+    client.commands.get(commandName) ||
+    client.commands.find(
+      cmd => cmd.alliases && cmd.alliases.includes(commandName)
+    );
+  if (!command) return;
 
   // Check if Guild only command.
   if (command.guildOnly && message.channel.type !== 'text') {

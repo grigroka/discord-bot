@@ -2,6 +2,7 @@
 
 module.exports = {
   name: 'avatar',
+  aliases: ['icon', 'pfp'],
   description: 'Show Users or Mentioned avatar.',
   args: true,
   usage: '<@user> ...',
