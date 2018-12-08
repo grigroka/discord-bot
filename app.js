@@ -18,23 +18,33 @@ for (const file of commandFiles) {
   client.commands.set(command.name, command);
 }
 
-client.once('ready', () => {
-  console.log('Ready!');
-});
-
+// Execute Commands on message
 client.on('message', message => {
   // If the message either doesn't start with the prefix or was sent by a bot, exit early.
   if (!message.content.startsWith(prefix) || message.author.bot) return;
 
-  // Variables
+  // Set command arguments and command name
   const args = message.content.slice(prefix.length).split(/ +/);
   const commandName = args.shift().toLowerCase();
 
   // If no such command name exit early.
   if (!client.commands.has(commandName)) return;
 
-  // Get and execute command with given args
+  // Set command
   const command = client.commands.get(commandName);
+
+  // Check if command takes in args.
+  if (command.args && !args.length) {
+    let reply = `You didn't provide any arguments, ${message.author}!`;
+    if (command.usage) {
+      reply += `\nThe proper usage would be: \`${prefix}${command.name} ${
+        command.usage
+      }\``;
+    }
+    return message.channel.send(reply);
+  }
+
+  // Get and execute command with given args.
   try {
     command.execute(message, args);
   } catch (error) {

@@ -2,15 +2,15 @@
 
 module.exports = {
   name: 'args-info',
-  description: 'Show Commands first arg, if foo return bar.',
+  description: 'Information about the arguments provided.',
+  args: true,
+  usage: '<args>',
   execute(message, args) {
-    if (!args.length) {
-      return message.channel.send(
-        `You didn't provide any arguments, ${message.author}!`
-      );
-    } else if (args[0] === 'foo') {
+    if (args[0] === 'foo') {
       return message.channel.send('bar');
     }
-    message.channel.send(`First argument: ${args[0]}`);
+    message.channel.send(
+      `Arguments: ${args}\nArguments length: ${args.length}`
+    );
   }
 };
